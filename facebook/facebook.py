@@ -1,10 +1,16 @@
 # FB爬蟲
 
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time
+from information import *
+
 
 def openFB(url):
-    from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-
     my_options = webdriver.ChromeOptions()
     my_options.add_argument("--start-maximized")  # 最大化視窗
     my_options.add_argument("--incognito")  # 開啟無痕模式
@@ -12,19 +18,13 @@ def openFB(url):
     my_options.add_argument("--disable-notifications")  # 取消 chrome 推播通知
     my_options.add_argument("--lang=zh-TW")  # 設定為正體中文
 
-    my_service = Service(executable_path="../chromedriver.exe")
+    my_service = Service(executable_path="./chromedriver.exe")
     driver = webdriver.Chrome(options=my_options, service=my_service)
     driver.get(url)
     return driver
 
 
 def loginFB(username, password, driver):
-    import time
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.common.keys import Keys
-
     time.sleep(1)
     WebDriverWait(driver, 30).until(
         EC.presence_of_element_located((By.XPATH, '//*[@id="email"]'))
@@ -48,8 +48,6 @@ def loginFB(username, password, driver):
 
 
 def scroll():
-    import time
-
     innerHeight = 0
     offset = 0
     count = 0
@@ -76,12 +74,7 @@ def scroll():
             break
 
 
-def traffic_information(driver):
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-    from selenium.webdriver.common.by import By
-    import time
-
+def traffic_information():
     WebDriverWait(driver, 30).until(
         EC.presence_of_element_located(
             (By.CSS_SELECTOR, "div.x11i5rnm.xat24cr.x1mh8g0r.x1vvkbs.xtlvy1s.x126k92a")
@@ -96,7 +89,7 @@ def traffic_information(driver):
     target_tag = driver.find_elements(
         By.CSS_SELECTOR, "div.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.x1vvkbs.x126k92a"
     )
-    # 內容
+    # 內容(需觸及"查看更多")
     tag = "x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz xt0b8zv xzsf02u x1s688f"
     tag = tag.replace(" ", ".")
     target_content = driver.find_elements(
@@ -127,8 +120,6 @@ if __name__ == "__main__":
     url = "https://www.facebook.com"
     driver = openFB(url)
 
-    from information import *
-
     username = username
     password = password
 
@@ -136,7 +127,9 @@ if __name__ == "__main__":
     groups = "https://www.facebook.com/groups/TaiwanSurfCarpool"
     driver.get(groups)
     scroll()
-    soup = traffic_information(driver)
+    time.sleep(2)
+    soup = traffic_information()
+
     for index, (person, content) in enumerate(soup.items()):
         print(f"第{index+1}筆資料:\n{person}\n{content}")
         print("=" * 50)

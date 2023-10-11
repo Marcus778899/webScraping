@@ -3,3 +3,4 @@ test.ipynb
 information.py
 __pycache__
 .vscode
+*.csv
